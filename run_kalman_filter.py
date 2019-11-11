@@ -9,17 +9,18 @@ def main():
 
     x0 = np.array([1.0])
     process_dim = 1
+    obs_dim = 3
 
     true_x = np.zeros(n_iters + 1)
     true_x[0] = x0[0]
     trans_noise = np.random.normal(0, 0.2, n_iters)
     trans_mats = np.tile(np.zeros((1,1)), (n_iters, 1, 1))
 
-    obs = np.zeros((n_iters, 3))
-    obs_noise = np.random.normal(0, 0.4, (n_iters, 3))
+    obs = np.zeros((n_iters, obs_dim))
+    obs_noise = np.random.normal(0, 0.4, (n_iters, obs_dim))
 
     for i in range(1, n_iters+1):
-        trans_mats[i-1, :, :] = np.array([[random.random() + 0.5]])
+        trans_mats[i-1, :, :] = np.array([[random.random() * 0.5 + 0.75]])
         true_x[i] =  trans_mats[i-1, :, :].item() * true_x[i-1] + trans_noise[i-1]
         obs[i-1,:] = true_x[i] + obs_noise[i-1, :]
 
@@ -28,8 +29,8 @@ def main():
         'x_mean_prev_post': x0,
         'x_cov_prev_post': np.array([[0.05]]),
         'obs': obs,
-        'obs_mats': np.tile(np.ones((3, 1)), (n_iters, 1, 1)),
-        'obs_covs': np.tile(0.16 * np.identity(3), (n_iters, 1, 1)),
+        'obs_mats': np.tile(np.ones((obs_dim, 1)), (n_iters, 1, 1)),
+        'obs_covs': np.tile(0.16 * np.identity(obs_dim), (n_iters, 1, 1)),
         'trans_mats': trans_mats,
         'trans_covs': np.tile(0.04, (n_iters, 1, 1)),
     }
@@ -41,12 +42,16 @@ def main():
     print(f'MSE for Kalman Filter mean: \t {np.sum((res[:, 0] - np.array(true_x[1:]))**2):.3f}')
 
     x_scale = list(range(1, n_iters+1))
-    plt.plot(x_scale, res[:, 0], 'b-')
-    plt.plot([0] + x_scale, true_x, 'g-')
-    plt.plot(x_scale, obs[:, 0], 'k--', linewidth=0.5)
-    plt.plot(x_scale, obs[:, 1], 'k--', linewidth=0.5)
-    plt.plot(x_scale, obs[:, 2], 'k--', linewidth=0.5)
-    plt.plot(x_scale, mean_obs, 'r-')
+    kf_curve, = plt.plot(x_scale, res[:, 0], 'b-')
+    true_curve, = plt.plot([0] + x_scale, true_x, 'g-')
+    for i in range(obs_dim):
+        obs_curve, = plt.plot(x_scale, obs[:, i], 'k--', linewidth=0.5)
+    mean_obs_curve, = plt.plot(x_scale, mean_obs, 'r-')
+
+    plt.legend((kf_curve, true_curve, obs_curve, mean_obs_curve),
+        ('Kalman Filter', 'True Process', 'Observations', 'Observation Mean'),
+        loc='best')
+
     plt.show()
     """ for i, re in enumerate(res):
         print('%.3f' % true_x[i+1], end='\t')
