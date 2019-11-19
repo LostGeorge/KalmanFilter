@@ -2,11 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 from kalman_utils import kalman_filter_iter
-from energy_balance_ode import e_balance_transition_matrix
+from lorenz_96 import lorenz_transition_matrix
 
 def main():
-
-    n_iters = 125
+    pass
+    # TODO: Everything
+    """ n_iters = 125
 
     x0 = np.array([265], dtype=np.float64)
     process_dim = 1
@@ -54,11 +55,7 @@ def main():
         ('Kalman Filter', 'True Process', 'Observations', 'Observation Mean'),
         loc='best')
 
-    plt.show()
-    """ for i, re in enumerate(res):
-        print('%.3f' % true_x[i+1], end='\t')
-        print('%.3f' % obs[i,:], end='\t')
-        print(re, end='\n') """
+    plt.show() """
 
 if __name__ == '__main__':
     main()

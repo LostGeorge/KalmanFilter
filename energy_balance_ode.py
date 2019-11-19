@@ -16,7 +16,6 @@ def albedo(temp):
 def temp_deriv(temp):
     return ((1 - albedo(temp)) * Q - eps * sigma * temp**4) / C
 
-# TODO: Runge-Kutta Transition Function
 def e_balance_transition_matrix(temp, step=8E25):
     temp = temp.item()
     k = np.zeros(4)
