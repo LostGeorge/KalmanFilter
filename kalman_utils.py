@@ -14,9 +14,10 @@ def get_kalman_gain(x_cov_curr_prior, obs_mat, obs_cov):
 
 def kalman_filter_iter(num_iters, mode, **data_dict):
     
-    results = np.zeros((num_iters, 2))
-
     process_dim = data_dict['process_dim']
+
+    results_mean = np.zeros((num_iters, process_dim))
+    results_cov = np.zeros((num_iters, process_dim, process_dim))
     
     x_mean_prev_post = data_dict['x_mean_prev_post']
     x_cov_prev_post = data_dict['x_cov_prev_post']
@@ -50,6 +51,7 @@ def kalman_filter_iter(num_iters, mode, **data_dict):
         x_mean_prev_post = x_mean_curr_post
         x_cov_prev_post = x_cov_curr_pos 
 
-        results[i, :] = [x_mean_prev_post, x_cov_prev_post]
+        results_mean[i, :] = x_mean_prev_post
+        results_cov[i, :, :] = x_cov_prev_post
 
-    return results
+    return (results_mean, results_cov)

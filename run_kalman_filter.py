@@ -37,14 +37,14 @@ def main():
         'trans_covs': np.tile(0.36, (n_iters, 1, 1)),
     }
 
-    res = kalman_filter_iter(n_iters, e_balance_transition_matrix, **input_data)
+    res = kalman_filter_iter(n_iters, e_balance_transition_matrix, **input_data)[0].flatten()
 
     mean_obs = np.mean(obs, axis=1)
     print(f'MSE for observation mean: \t {np.sum((mean_obs - np.array(true_x[1:]))**2):.3f}')
-    print(f'MSE for Kalman Filter mean: \t {np.sum((res[:, 0] - np.array(true_x[1:]))**2):.3f}')
-
+    print(f'MSE for Kalman Filter: \t {np.sum((res - np.array(true_x[1:]))**2):.3f}')
+    
     x_scale = list(range(1, n_iters+1))
-    kf_curve, = plt.plot(x_scale, res[:, 0], 'b-', linewidth=0.5)
+    kf_curve, = plt.plot(x_scale, res, 'b-', linewidth=0.5)
     true_curve, = plt.plot([0] + x_scale, true_x, 'g-', linewidth=0.5)
     for i in range(obs_dim):
         obs_curve, = plt.plot(x_scale, obs[:, i], 'k--', linewidth=0.1)

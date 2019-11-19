@@ -5,7 +5,7 @@ F = 8 # forcing
 
 def lorenz_grad(x):
     global N
-    nabla = np.zeros((N, 1))
+    nabla = np.zeros(N)
     nabla[0] = (x[1] - x[N-2]) * x[N-1] - x[0]
     nabla[1] = (x[2] - x[N-1]) * x[0] - x[1]
     nabla[N-1] = (x[0] - x[N-3]) * x[N-2] - x[N-1]
