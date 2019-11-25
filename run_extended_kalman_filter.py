@@ -1,8 +1,8 @@
+import random
 import numpy as np
 import matplotlib.pyplot as plt
-import random
 from kalman_utils import kalman_filter_iter
-from lorenz_96 import lorenz_transition_matrix
+from lorenz_96 import lorenz_rk4_transition
 
 def main():
     # TODO: Everything
@@ -17,14 +17,17 @@ def main():
     true_x = np.zeros((n_iters + 1, process_dim))
     true_x[0, :] = x0
     trans_noise = np.random.normal(0, 0.2, (n_iters, process_dim))
-    trans_mats = np.tile(np.zeros((process_dim, process_dim)), (n_iters, 1, 1))
+    trans_mats = np.tile(np.zeros((process_dim, process_dim)), (n_iters + 1, 1, 1))
+    # assign x0_jacobian to trans_mats[0, :, :]
 
     obs = np.zeros((n_iters, obs_dim))
     obs_noise = np.random.normal(0, 1, (n_iters, obs_dim))
 
 
     for i in range(1, n_iters+1):
-        true_x[i, :] = lorenz_transition_matrix(np.array(true_x[i-1, :], dtype=np.float64)) @ true_x[i-1, :] + trans_noise[i-1, :]
+        true_x[i, :], trans_mats[i, :, :] = lorenz_rk4_transition(
+            np.array(true_x[i-1, :]), trans_mats[i-1, :, :])
+        true_x[i, :] += trans_noise[i-1, :]
         obs[i-1,:] = true_x[i, :] + obs_noise[i-1, :]
 
     input_data = {
@@ -34,11 +37,11 @@ def main():
         'obs': obs,
         'obs_mats': np.tile(np.identity(obs_dim), (n_iters, 1, 1)),
         'obs_covs': np.tile(1 * np.identity(obs_dim), (n_iters, 1, 1)),
-        'trans_mats': trans_mats,
+        'trans_mats': trans_mats[1:, :, :],
         'trans_covs': np.tile(0.04, (n_iters, 1, 1)),
     }
 
-    res = kalman_filter_iter(n_iters, lorenz_transition_matrix, **input_data)[0]
+    res = kalman_filter_iter(n_iters, 'matrix', **input_data)[0]
 
     #mean_obs = np.mean(obs, axis=1)
     #print(f'MSE for observation mean: \t {np.sum((mean_obs - np.array(true_x[1:]))**2):.3f}')
