@@ -1,11 +1,10 @@
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 from kalman_utils import kalman_filter_iter
 from lorenz_96 import lorenz_rk4_transition
 
 def main():
-    # TODO: Everything
+    # TODO: Initial Jacobian and covariance, figure out some values for other covs
     n_iters = 200
 
     process_dim = 12
@@ -28,7 +27,7 @@ def main():
         true_x[i, :], trans_mats[i, :, :] = lorenz_rk4_transition(
             np.array(true_x[i-1, :]), trans_mats[i-1, :, :])
         true_x[i, :] += trans_noise[i-1, :]
-        obs[i-1,:] = true_x[i, :] + obs_noise[i-1, :]
+        obs[i-1, :] = true_x[i, :] + obs_noise[i-1, :]
 
     input_data = {
         'process_dim': process_dim,
