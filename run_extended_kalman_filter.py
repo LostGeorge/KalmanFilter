@@ -22,6 +22,7 @@ def main():
     obs = np.zeros((n_iters, obs_dim))
     obs_noise = np.random.normal(0, 1, (n_iters, obs_dim))
 
+
     for i in range(1, n_iters+1):
         true_x[i, :] = lorenz_transition_matrix(np.array(true_x[i-1, :], dtype=np.float64)) @ true_x[i-1, :] + trans_noise[i-1, :]
         obs[i-1,:] = true_x[i, :] + obs_noise[i-1, :]
